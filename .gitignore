@@ -1,0 +1,22 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Dependency folders, if tooling is added later
+node_modules/
+
+# Extension packages
+*.crx
+*.pem
+*.zip
+
+# Local secrets
+.env
+.env.*

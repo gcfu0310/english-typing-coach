@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT English Typing Coach",
+  "description": "Translate Chinese drafts into natural English for typing practice, then save useful words and phrases as notes.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "English Typing Coach",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage"
+  ]
+}

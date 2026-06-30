@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>English Typing Coach Notes</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header class="popup-header">
+        <div>
+          <h1>My Notes</h1>
+          <p id="note-count">0 notes</p>
+        </div>
+        <button id="refresh-button" type="button">Refresh</button>
+      </header>
+
+      <section id="notes-list" class="notes-list" aria-live="polite"></section>
+      <p id="empty-state" class="empty-state">No notes yet. Add words or phrases from the ChatGPT page.</p>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
