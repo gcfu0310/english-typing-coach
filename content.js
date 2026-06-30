@@ -142,25 +142,49 @@
     return note;
   }
 
-  function mockTranslate(chineseText) {
+  function buildMockTranslationResult(chineseText) {
     const normalizedText = chineseText.replace(/\s+/g, "");
 
     const examples = [
       {
         keywords: ["\u8bbe\u8ba1", "\u5408\u7406"],
-        translation: "I want to check whether this design makes sense."
+        translation: "I want to check whether this design makes sense.",
+        phrases: [
+          {
+            text: "make sense",
+            meaning: "\u5408\u7406\uff1b\u8bf4\u5f97\u901a"
+          }
+        ]
       },
       {
         keywords: ["\u63d2\u4ef6", "\u5f00\u53d1"],
-        translation: "I want to develop a plugin for learning English while chatting with ChatGPT."
+        translation: "I want to develop a plugin for learning English while chatting with ChatGPT.",
+        phrases: [
+          {
+            text: "develop a plugin",
+            meaning: "\u5f00\u53d1\u4e00\u4e2a\u63d2\u4ef6"
+          }
+        ]
       },
       {
         keywords: ["\u529f\u80fd", "\u6e05\u5355"],
-        translation: "Let's start by writing the feature list and technical plan."
+        translation: "Let's start by writing the feature list and technical plan.",
+        phrases: [
+          {
+            text: "feature list",
+            meaning: "\u529f\u80fd\u6e05\u5355"
+          }
+        ]
       },
       {
         keywords: ["\u4e0b\u4e00\u6b65"],
-        translation: "Let's move on to the next step."
+        translation: "Let's move on to the next step.",
+        phrases: [
+          {
+            text: "move on to",
+            meaning: "\u8fdb\u5165\uff1b\u5f00\u59cb\u5904\u7406"
+          }
+        ]
       }
     ];
 
@@ -171,10 +195,45 @@
     });
 
     if (matchedExample) {
-      return matchedExample.translation;
+      return {
+        translation: matchedExample.translation,
+        phrases: matchedExample.phrases
+      };
     }
 
-    return "This is a mock English translation. We will replace it with DeepSeek later.";
+    return {
+      translation: "This is a mock English translation. We will replace it with DeepSeek later.",
+      phrases: []
+    };
+  }
+
+  function requestTranslation(sourceText) {
+    if (typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) {
+      return Promise.resolve({
+        ok: false,
+        error: "Extension runtime is not available on this test page."
+      });
+    }
+
+    return new Promise(function (resolve) {
+      chrome.runtime.sendMessage({
+        type: "translate",
+        sourceText: sourceText
+      }, function (response) {
+        if (chrome.runtime.lastError) {
+          resolve({
+            ok: false,
+            error: chrome.runtime.lastError.message
+          });
+          return;
+        }
+
+        resolve(response || {
+          ok: false,
+          error: "No response from background script."
+        });
+      });
+    });
   }
 
   function createPanel() {
@@ -198,6 +257,7 @@
       <pre id="etc-draft-output">No draft loaded yet.</pre>
       <label class="etc-label" for="etc-translation-output">Suggested English</label>
       <pre id="etc-translation-output">No translation yet.</pre>
+      <div id="etc-phrase-suggestions" class="etc-phrase-suggestions"></div>
       <div class="etc-secondary-actions">
         <button id="etc-copy-button" type="button">Copy English</button>
         <button id="etc-insert-button" type="button">Insert English</button>
@@ -221,14 +281,42 @@
     const addNoteButton = panel.querySelector("#etc-add-note-button");
     const draftOutput = panel.querySelector("#etc-draft-output");
     const translationOutput = panel.querySelector("#etc-translation-output");
+    const phraseSuggestions = panel.querySelector("#etc-phrase-suggestions");
     const noteTextInput = panel.querySelector("#etc-note-text");
     const noteMeaningInput = panel.querySelector("#etc-note-meaning");
     const status = panel.querySelector("#etc-status");
     let latestDraft = "";
     let latestTranslation = "";
+    let latestPhrases = [];
 
     function setStatus(message) {
       status.textContent = message;
+    }
+
+    function renderPhraseSuggestions(phrases) {
+      phraseSuggestions.replaceChildren();
+
+      if (!phrases.length) {
+        return;
+      }
+
+      const label = document.createElement("div");
+      label.className = "etc-phrase-title";
+      label.textContent = "Suggested phrases";
+      phraseSuggestions.appendChild(label);
+
+      phrases.forEach(function (phrase) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "etc-phrase-button";
+        button.textContent = phrase.text + " = " + phrase.meaning;
+        button.addEventListener("click", function () {
+          noteTextInput.value = phrase.text;
+          noteMeaningInput.value = phrase.meaning;
+          setStatus("Phrase filled into the note form.");
+        });
+        phraseSuggestions.appendChild(button);
+      });
     }
 
     readButton.addEventListener("click", function () {
@@ -246,15 +334,37 @@
         translationOutput.textContent = "No translation yet.";
         latestDraft = "";
         latestTranslation = "";
+        latestPhrases = [];
+        renderPhraseSuggestions([]);
         setStatus("");
         return;
       }
 
       latestDraft = draftText;
-      latestTranslation = mockTranslate(draftText);
       draftOutput.textContent = draftText;
-      translationOutput.textContent = latestTranslation;
-      setStatus("Mock translation ready.");
+      translationOutput.textContent = "Translating...";
+      latestTranslation = "";
+      latestPhrases = [];
+      renderPhraseSuggestions([]);
+      setStatus("Requesting DeepSeek translation...");
+
+      requestTranslation(draftText).then(function (response) {
+        let result = response && response.ok ? response.result : null;
+        let statusMessage = "DeepSeek translation ready.";
+
+        if (!result || !result.translation) {
+          result = buildMockTranslationResult(draftText);
+          statusMessage = response && response.error
+            ? "Using mock translation: " + response.error
+            : "Using mock translation.";
+        }
+
+        latestTranslation = result.translation;
+        latestPhrases = Array.isArray(result.phrases) ? result.phrases : [];
+        translationOutput.textContent = latestTranslation;
+        renderPhraseSuggestions(latestPhrases);
+        setStatus(statusMessage);
+      });
     });
 
     copyButton.addEventListener("click", async function () {

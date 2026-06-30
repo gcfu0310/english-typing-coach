@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.2.0 - 2026-06-30
+
+### Added
+
+- Options page for DeepSeek API key, base URL, model, and translation style.
+- Background service worker for model requests.
+- DeepSeek-compatible `/chat/completions` translation flow.
+- Structured translation response with suggested phrases.
+- Clickable phrase suggestions that fill the note form.
+- Popup `Options` shortcut.
+
+### Changed
+
+- `Translate` now tries DeepSeek first and falls back to mock translation when configuration or API access is unavailable.
+
 ## v0.1.0 - 2026-06-30
 
 Initial MVP prototype.

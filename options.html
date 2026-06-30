@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>English Typing Coach Options</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main class="options-shell">
+      <header>
+        <h1>English Typing Coach</h1>
+        <p>Configure the model used for Chinese-to-English typing practice.</p>
+      </header>
+
+      <form id="settings-form">
+        <label for="api-key">DeepSeek API Key</label>
+        <input id="api-key" type="password" autocomplete="off" placeholder="sk-...">
+
+        <label for="base-url">Base URL</label>
+        <input id="base-url" type="url" placeholder="https://api.deepseek.com">
+
+        <label for="model">Model</label>
+        <select id="model">
+          <option value="deepseek-v4-flash">deepseek-v4-flash</option>
+          <option value="deepseek-v4-pro">deepseek-v4-pro</option>
+        </select>
+
+        <label for="style">Translation Style</label>
+        <select id="style">
+          <option value="natural">Natural</option>
+          <option value="casual">Casual</option>
+          <option value="formal">Formal</option>
+          <option value="simple">Simple</option>
+        </select>
+
+        <button type="submit">Save Settings</button>
+      </form>
+
+      <p id="status" class="status" aria-live="polite"></p>
+      <p class="hint">Your API key is stored locally in Chrome extension storage. Do not commit real keys to GitHub.</p>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>

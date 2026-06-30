@@ -2,10 +2,14 @@
   "manifest_version": 3,
   "name": "ChatGPT English Typing Coach",
   "description": "Translate Chinese drafts into natural English for typing practice, then save useful words and phrases as notes.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "action": {
     "default_title": "English Typing Coach",
     "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -24,5 +28,8 @@
   ],
   "permissions": [
     "storage"
+  ],
+  "host_permissions": [
+    "https://api.deepseek.com/*"
   ]
 }

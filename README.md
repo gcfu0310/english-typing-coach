@@ -6,15 +6,17 @@ The extension reads a Chinese draft from the ChatGPT input box, shows a suggeste
 
 ## Current Version
 
-`v0.1.0`
+`v0.2.0`
 
-This is an MVP prototype. Translation is currently mocked, so no external model API is required yet.
+This is still an early prototype. It can call DeepSeek for real translation after you configure an API key. If the API key is missing or the request fails, the content panel falls back to mock translation so the local workflow remains testable.
 
 ## Features
 
 - Injects an `English Coach` panel into ChatGPT pages.
 - Reads the current Chinese draft from the ChatGPT input box.
-- Shows a mocked English suggestion.
+- Shows a DeepSeek English suggestion when configured.
+- Falls back to a mocked English suggestion when model access is unavailable.
+- Shows suggested words or phrases returned by the model.
 - Copies the English suggestion.
 - Inserts the English suggestion back into the ChatGPT input box.
 - Saves words or phrases with meanings as notes.
@@ -73,22 +75,56 @@ english-typing-coach/
   popup.html
   popup.js
   popup.css
+  options.html
+  options.js
+  options.css
+  background.js
   TESTING.md
+```
+
+## DeepSeek Setup
+
+1. Load the extension locally.
+2. Click the extension icon.
+3. Click `Options`.
+4. Enter your DeepSeek API key.
+5. Keep the default base URL unless DeepSeek changes it:
+
+```text
+https://api.deepseek.com
+```
+
+6. Choose a model:
+
+```text
+deepseek-v4-flash
+```
+
+or:
+
+```text
+deepseek-v4-pro
+```
+
+7. Save settings.
+
+The extension sends translation requests from `background.js` to:
+
+```text
+/chat/completions
 ```
 
 ## Roadmap
 
 Next planned steps:
 
-- Add an options page for API key, base URL, model name, and style preferences.
-- Add a background service worker.
-- Replace `mockTranslate()` with a real DeepSeek API call.
-- Return structured translation results with suggested phrases.
-- Auto-suggest useful words and phrases for notes.
+- Improve error handling and loading states.
+- Add a safe test button on the options page.
+- Improve phrase extraction and note creation.
 - Add note search, export, and review features.
 
 ## Privacy
 
-In `v0.1.0`, no external API is called. Notes are stored locally in the browser.
+Notes and settings are stored locally in the browser.
 
-Future versions that connect to DeepSeek or another model provider should keep API keys in extension storage and must never commit real keys to the repository.
+When DeepSeek is configured, Chinese drafts are sent to the configured model provider for translation. Never commit real API keys to the repository.

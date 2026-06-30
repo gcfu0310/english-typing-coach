@@ -5,6 +5,7 @@
   const noteCount = document.getElementById("note-count");
   const emptyState = document.getElementById("empty-state");
   const refreshButton = document.getElementById("refresh-button");
+  const optionsButton = document.getElementById("options-button");
 
   function getStorageArea() {
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
@@ -117,5 +118,10 @@
   }
 
   refreshButton.addEventListener("click", loadNotes);
+  optionsButton.addEventListener("click", function () {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.openOptionsPage) {
+      chrome.runtime.openOptionsPage();
+    }
+  });
   loadNotes();
 })();
