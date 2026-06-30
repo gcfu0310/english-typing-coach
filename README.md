@@ -1,5 +1,7 @@
 # ChatGPT English Typing Coach
 
+[简体中文](README.zh-CN.md) | English
+
 A Chrome/Edge extension for learning English while chatting with ChatGPT.
 
 The extension reads a Chinese draft from the ChatGPT input box, shows a suggested English version for typing practice, and lets you save useful words or phrases as local notes.
